@@ -74,5 +74,7 @@ class Stash(models.Model):
     count = models.PositiveIntegerField(default=0, blank=True, verbose_name='Количество')
     image = models.ImageField(upload_to=get_image_path_for_stash, null=True, blank=True,
                               verbose_name='Изображение товара')
-
+    description = models.TextField(default='', blank=True, verbose_name='Описание', max_length=1500)
+    is_delivery_available = models.BooleanField(default=False, blank=True, verbose_name='Доступность доставки')
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, verbose_name='Дата создания')
 
