@@ -40,8 +40,8 @@ def get_image_path_for_shop(instance, filename):
 
 
 class Shop(models.Model):
-    name = models.CharField(null=False, blank=False, verbose_name='Полное название')
-    name_short = models.CharField(null=False, blank=True, default='', verbose_name='Короткое название')
+    name = models.CharField(max_length=150, null=False, blank=False, verbose_name='Полное название')
+    name_short = models.CharField(max_length=20, null=False, blank=True, default='', verbose_name='Короткое название')
     slug_name = models.CharField(null=False, unique=True, blank=False, max_length=20, verbose_name='Название для URL')
     inn = models.CharField(max_length=12, null=False, blank=False, verbose_name='ИНН')
     ceo = models.CharField(max_length=56, null=False, blank=False, verbose_name='Фамилия И.О. руководителя')
@@ -65,6 +65,9 @@ class Product(models.Model):
     name = models.CharField(max_length=100, blank=False, verbose_name='Наименование продукта')
     shop = models.ManyToManyField(Shop, through='Stash')
 
+    def __str__(self):
+        return self.name
+
 
 class Stash(models.Model):
     article = models.CharField(max_length=15, default=randomize_product_article, blank=True, editable=False,
@@ -72,9 +75,33 @@ class Stash(models.Model):
     product = models.ForeignKey(Product, related_name='shops', verbose_name='Продукт', on_delete=models.PROTECT)
     shop = models.ForeignKey(Shop, related_name='products', on_delete=models.CASCADE, verbose_name='Магазин')
     count = models.PositiveIntegerField(default=0, blank=True, verbose_name='Количество')
+    cost = models.FloatField(default=0.0, blank=False, verbose_name='Стоимость, в рублях')
     image = models.ImageField(upload_to=get_image_path_for_stash, null=True, blank=True,
                               verbose_name='Изображение товара')
     description = models.TextField(default='', blank=True, verbose_name='Описание', max_length=1500)
     is_delivery_available = models.BooleanField(default=False, blank=True, verbose_name='Доступность доставки')
     created_at = models.DateTimeField(auto_now_add=True, blank=True, verbose_name='Дата создания')
+
+    def __str__(self):
+        return f'{self.article}.{self.shop.name_short if self.shop.name_short is not None else self.shop.name}: {self.product.name}'
+
+
+class CommentShopProduct(models.Model):
+    RATE_CHOICES = [
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5'),
+    ]
+
+    stash = models.ForeignKey(Stash, related_name='comments', on_delete=models.CASCADE, verbose_name='Товар')
+    rate = models.IntegerField(choices=RATE_CHOICES, blank=False, null=False, verbose_name='Оценка товара')
+    user = models.ForeignKey(User, related_name='comments_to_product', null=True, verbose_name='Комментатор',
+                             on_delete=models.SET_NULL)
+    caption = models.CharField(max_length=50, verbose_name='Заголовок комментария')
+    description = models.TextField(max_length=1000, blank=False, verbose_name='Текст комментария')
+
+    def __str__(self):
+        return f'{self.user.profile.last_name} {self.user.profile.first_name}: {self.caption}'
 
