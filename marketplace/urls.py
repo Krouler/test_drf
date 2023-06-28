@@ -1,11 +1,15 @@
-from django.urls import path
+from django.urls import path, include
 
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import SimpleRouter, DefaultRouter
 
-#routers = DefaultRouter()
+from marketplace.views import ShopViewSet
 
+
+routerShop = DefaultRouter()
+routerShop.register(r'shop', ShopViewSet)
+print(routerShop.urls)
 
 urlpatterns = [
-
+    path('', include(routerShop.urls)),
 ]
 
