@@ -15,7 +15,7 @@ def get_qs_list(model, only_field):
     return model.objects.only(only_field).values_list(only_field, flat=True)
 
 
-def randomize_product_article():
+def randomize_product_article(*args, **kwargs):
     qs_list = get_qs_list(Product, 'article')
     result_ = ''
     while result_ in qs_list or result_ == '':
@@ -23,7 +23,7 @@ def randomize_product_article():
     return result_
 
 
-def randomize_cred_num():
+def randomize_cred_num(*args, **kwargs):
     qs_list = get_qs_list(Shop, 'cred_num')
     result_ = ''
     while result_ in qs_list or result_ == '':
@@ -47,8 +47,7 @@ class Shop(models.Model):
     ceo = models.CharField(max_length=56, null=False, blank=False, verbose_name='Фамилия И.О. руководителя')
     balance = models.FloatField(default=0.0, blank=True, verbose_name='Баланс магазина')
     main_employee = models.ForeignKey(User, related_name='shops_maintainer', on_delete=models.PROTECT)
-    employee = models.ManyToManyField(User, related_name='shops', verbose_name='Сотрудник',
-                                      on_delete=models.SET_NULL, null=True)
+    employee = models.ManyToManyField(User, related_name='shops', verbose_name='Сотрудник')
     cred_num = models.CharField(max_length=12, default=randomize_cred_num, blank=True, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False, verbose_name='Дата и время создания')
     avatar = models.ImageField(upload_to=get_image_path_for_shop, null=True, blank=True, verbose_name='Аватар магазина')
