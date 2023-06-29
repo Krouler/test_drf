@@ -14,7 +14,7 @@ class ShopViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         try:
             flag = self.request.user == self.get_object().confdata.main_employee
-        except:
+        except Exception:
             flag = False
         if self.request.user.is_staff or flag:
             return ShopSerializer
