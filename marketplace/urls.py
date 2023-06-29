@@ -2,14 +2,16 @@ from django.urls import path, include
 
 from rest_framework.routers import SimpleRouter, DefaultRouter
 
-from marketplace.views import ShopViewSet
-
+from marketplace.routers import ShopRouter, ConfDataRouter
+from marketplace.views import ShopViewSet, ConfDataUpdateAPIView
 
 routerShop = DefaultRouter()
 routerShop.register(r'shop', ShopViewSet)
-print(routerShop.urls)
+routerConfData = ConfDataRouter()
+routerConfData.register(r'confdata', ConfDataUpdateAPIView, basename='confidentialinfoshop')
 
 urlpatterns = [
     path('', include(routerShop.urls)),
+    path('shop/<slug_name>/confdata/', ConfDataUpdateAPIView.as_view({'put': 'update', 'patch': 'partial_update'}), name='confdata-detail'),
 ]
 

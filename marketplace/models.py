@@ -40,17 +40,15 @@ def get_image_path_for_shop(instance, filename):
 
 
 class Shop(models.Model):
-    name = models.CharField(max_length=150, null=False, blank=False, verbose_name='Полное название')
-    name_short = models.CharField(max_length=20, null=False, blank=True, default='', verbose_name='Короткое название')
-    slug_name = models.CharField(null=False, unique=True, blank=False, max_length=20, verbose_name='Название для URL')
+    name = models.CharField(max_length=150, null=False, blank=False, unique=True, verbose_name='Полное название')
+    name_short = models.CharField(max_length=20, null=False, blank=True, unique=True, default='', verbose_name='Короткое название')
     inn = models.CharField(max_length=12, null=False, blank=False, verbose_name='ИНН')
     ceo = models.CharField(max_length=56, null=False, blank=False, verbose_name='Фамилия И.О. руководителя')
-    balance = models.FloatField(default=0.0, blank=True, verbose_name='Баланс магазина')
-    main_employee = models.ForeignKey(User, related_name='shops_maintainer', on_delete=models.PROTECT)
-    employee = models.ManyToManyField(User, related_name='shops', verbose_name='Сотрудник')
-    cred_num = models.CharField(max_length=12, default=randomize_cred_num, blank=True, editable=False, unique=True)
+    cred_num = models.CharField(max_length=12, default=randomize_cred_num, blank=True, editable=False, unique=True,
+                                verbose_name='Внутренний номер счета')
     created_at = models.DateTimeField(auto_now_add=True, editable=False, verbose_name='Дата и время создания')
     avatar = models.ImageField(upload_to=get_image_path_for_shop, null=True, blank=True, verbose_name='Аватар магазина')
+    slug_name = models.CharField(null=False, unique=True, blank=False, max_length=20, verbose_name='Название для URL')
 
     class Meta:
         verbose_name = 'Магазин'
@@ -58,6 +56,16 @@ class Shop(models.Model):
 
     def __str__(self):
         return self.name_short
+
+
+class ConfidentialInfoShop(models.Model):
+    shop = models.OneToOneField(Shop, related_name='confdata', on_delete=models.CASCADE)
+    balance = models.FloatField(default=0.0, blank=True, verbose_name='Баланс магазина')
+    employee = models.ManyToManyField(User, related_name='shops', verbose_name='Сотрудник')
+    main_employee = models.ForeignKey(User, related_name='shops_maintainer', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f'conf {self.shop.name}'
 
 
 class Product(models.Model):
