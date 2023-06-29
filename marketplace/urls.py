@@ -7,8 +7,6 @@ from marketplace.views import ShopViewSet, ConfDataUpdateAPIView
 
 routerShop = DefaultRouter()
 routerShop.register(r'shop', ShopViewSet)
-routerConfData = ConfDataRouter()
-routerConfData.register(r'confdata', ConfDataUpdateAPIView, basename='confidentialinfoshop')
 
 urlpatterns = [
     path('', include(routerShop.urls)),
