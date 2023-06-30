@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from marketplace.models import Shop, ConfidentialInfoShop
+from marketplace.models import Shop, ConfidentialInfoShop, Product
 
 
 class ShopConfData(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class ShopSerializerForCustomer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Shop
-        fields = '__all__'
+        exclude = ('balance', )
 
 
 class ShopSerializer(serializers.ModelSerializer):
@@ -26,10 +26,17 @@ class ShopSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shop
         fields = '__all__'
-        read_only_fields = ('cred_num',)
+        read_only_fields = ('cred_num', 'balance')
 
     def get_conf_data(self, obj):
         confdata = ConfidentialInfoShop.objects.get(shop=obj)
         return ShopConfData(confdata).data
 
+
+# class ProductSerializerForCustomer(serializers.HyperlinkedModelSerializer):
+#     url = serializers.HyperlinkedIdentityField()
+#
+#     class Meta:
+#         model = Product
+#         fields = '__all__'
 

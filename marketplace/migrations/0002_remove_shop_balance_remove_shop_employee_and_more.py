@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='shop',
             name='cred_num',
-            field=models.CharField(blank=True, default=marketplace.models.randomize_cred_num, editable=False, max_length=12, unique=True, verbose_name='Внутренний номер счета'),
+            field=models.CharField(blank=True, default='', editable=False, max_length=12, unique=True, verbose_name='Внутренний номер счета'),
         ),
         migrations.CreateModel(
             name='ConfidentialInfoShop',

@@ -46,3 +46,5 @@ class ConfDataUpdateAPIView(mixins.UpdateModelMixin, GenericViewSet):
         if self.obj is None:
             self.obj = self.queryset.get(shop__slug_name=self.kwargs.get('slug_name'))
         return self.obj
+
+

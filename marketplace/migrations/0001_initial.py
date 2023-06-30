@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('inn', models.CharField(max_length=12, verbose_name='ИНН')),
                 ('ceo', models.CharField(max_length=56, verbose_name='Фамилия И.О. руководителя')),
                 ('balance', models.FloatField(blank=True, default=0.0, verbose_name='Баланс магазина')),
-                ('cred_num', models.CharField(blank=True, default=marketplace.models.randomize_cred_num, editable=False, max_length=12, unique=True)),
+                ('cred_num', models.CharField(blank=True, default='', editable=False, max_length=12, unique=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания')),
                 ('avatar', models.ImageField(blank=True, null=True, upload_to=marketplace.models.get_image_path_for_shop, verbose_name='Аватар магазина')),
                 ('employee', models.ManyToManyField(related_name='shops', to=settings.AUTH_USER_MODEL, verbose_name='Сотрудник')),
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
             name='Stash',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('article', models.CharField(blank=True, default=marketplace.models.randomize_product_article, editable=False, max_length=15, unique=True, verbose_name='Артикул')),
+                ('article', models.CharField(blank=True, default='', editable=False, max_length=15, unique=True, verbose_name='Артикул')),
                 ('count', models.PositiveIntegerField(blank=True, default=0, verbose_name='Количество')),
                 ('cost', models.FloatField(default=0.0, verbose_name='Стоимость, в рублях')),
                 ('image', models.ImageField(blank=True, null=True, upload_to=marketplace.models.get_image_path_for_stash, verbose_name='Изображение товара')),
