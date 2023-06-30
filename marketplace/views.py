@@ -1,9 +1,10 @@
 from rest_framework import viewsets, mixins
 from rest_framework.viewsets import GenericViewSet
 
-from marketplace.models import Shop, ConfidentialInfoShop
-from marketplace.permissions import IsMaintainerOrReadOnly, IsMaintainer
-from marketplace.serializers import ShopSerializer, ShopSerializerForCustomer, ShopConfData
+from marketplace.models import Shop, ConfidentialInfoShop, Product
+from marketplace.permissions import IsMaintainerOrReadOnly, IsMaintainer, IsEmployeeOrIsStaffOrReadOnly
+from marketplace.serializers import ShopSerializer, ShopSerializerForCustomer, ShopConfData, \
+    ProductSerializerForCustomer
 
 
 class ShopViewSet(viewsets.ModelViewSet):
@@ -48,3 +49,12 @@ class ConfDataUpdateAPIView(mixins.UpdateModelMixin, GenericViewSet):
         return self.obj
 
 
+class ProductViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsEmployeeOrIsStaffOrReadOnly,)
+    serializer_class = ProductSerializerForCustomer
+
+    def create_filter_kwargs(self) -> dict:
+        return {'name__icontains': self.kwargs.get('name')} if self.kwargs.get('name') is not None else {}
+
+    def get_queryset(self):
+        return Product.objects.only('name').filter(**self.create_filter_kwargs())

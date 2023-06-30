@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from marketplace.models import Shop, ConfidentialInfoShop, Product
+from marketplace.models import Shop, ConfidentialInfoShop, Product, Stash
 
 
 class ShopConfData(serializers.ModelSerializer):
@@ -33,10 +33,23 @@ class ShopSerializer(serializers.ModelSerializer):
         return ShopConfData(confdata).data
 
 
-# class ProductSerializerForCustomer(serializers.HyperlinkedModelSerializer):
-#     url = serializers.HyperlinkedIdentityField()
-#
-#     class Meta:
-#         model = Product
-#         fields = '__all__'
+class ShopInfoInProduct(serializers.ModelSerializer):
 
+    class Meta:
+        model = Stash
+        fields = ('shop', 'cost', 'count')
+
+
+class ProductSerializerForCustomer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='product-detail', read_only=True)
+    in_shops = serializers.SerializerMethodField('get_shops')
+
+    class Meta:
+        model = Product
+        exclude = ('shop',)
+
+    def get_shops(self, obj):
+        qs = Stash.objects.select_related('shop', 'product').only('shop', 'cost', 'count', 'product').filter(product=obj)
+        if len(qs) > 0:
+            return ShopInfoInProduct(qs).data
+        return {}
