@@ -1,10 +1,29 @@
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
+from auth_user.models import Profile
 from marketplace.models import Shop, ConfidentialInfoShop, Product
 from marketplace.permissions import IsMaintainerOrReadOnly, IsMaintainer, IsEmployeeOrIsStaffOrReadOnly
 from marketplace.serializers import ShopSerializer, ShopSerializerForCustomer, ShopConfData, \
     ProductSerializerForCustomer
+
+
+class RetrieveUserFromCode(mixins.CreateModelMixin, GenericViewSet):
+    serializer_class =
+    permission_classes =
+
+    def get_queryset(self):
+        return Profile.objects.filter(invite_code=self.kwargs.get('invite_code'))
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
+
 
 
 class ShopViewSet(viewsets.ModelViewSet):
@@ -58,3 +77,8 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Product.objects.only('name').filter(**self.create_filter_kwargs())
+
+
+# class StashViewSet(viewsets.ModelViewSet):
+#     serializer_class = StashSerializerForCustomer
+#     permission_classes =

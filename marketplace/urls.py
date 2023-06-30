@@ -13,5 +13,6 @@ routerShop.registry.extend(routerProduct.registry)
 urlpatterns = [
     path('', include(routerShop.urls)),
     path('shop/<slug_name>/confdata/', ConfDataUpdateAPIView.as_view({'put': 'update', 'patch': 'partial_update'}), name='confdata-detail'),
+
 ]
 

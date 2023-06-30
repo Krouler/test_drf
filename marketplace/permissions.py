@@ -32,8 +32,10 @@ class IsEmployeeOrIsStaffOrReadOnly(BasePermission):
             return request.method in SAFE_METHODS
         return request.method in SAFE_METHODS
 
-
-
-
     def has_object_permission(self, request, view, obj):
         return request.user.is_staff or (request.method in SAFE_METHODS)
+
+
+# class IsAuthenticatedOrReadOnly(BasePermission):
+#     def has_permission(self, request, view):
+#

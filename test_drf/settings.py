@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'auth_user.apps.AuthUserConfig',
     'marketplace.apps.MarketplaceConfig',
     'courses.apps.CoursesConfig',
 ]

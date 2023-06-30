@@ -11,7 +11,21 @@ def get_image_path_for_shop(instance, filename):
     return 'shops_{0}/image/{1}'.format(instance.shop.id, filename)
 
 
-class ShopBaseModel(models.Model):
+class StringGeneratorHelperMixin:
+
+    @staticmethod
+    def make_result(lim, prefix=''):
+        result = prefix
+        while len(result) < lim:
+            result += str(randrange(10))
+        return result
+
+    @classmethod
+    def get_qs_list(cls, only_field):
+        return cls.objects.only(only_field).values_list(only_field, flat=True)
+
+
+class ShopBaseModel(StringGeneratorHelperMixin, models.Model):
     name = models.CharField(max_length=150, null=False, blank=False, unique=True, verbose_name='Полное название')
     name_short = models.CharField(max_length=20, null=False, blank=True, unique=True, default='',
                                   verbose_name='Короткое название')
@@ -26,17 +40,6 @@ class ShopBaseModel(models.Model):
 
     def __str__(self):
         return self.name_short
-
-    @staticmethod
-    def make_result(lim, prefix=''):
-        result = prefix
-        while len(result) < lim:
-            result += str(randrange(10))
-        return result
-
-    @classmethod
-    def get_qs_list(cls, only_field):
-        return cls.objects.only(only_field).values_list(only_field, flat=True)
 
     def create_cred_num(self):
         qs_list = self.get_qs_list('cred_num')
@@ -58,7 +61,7 @@ class ShopBaseModel(models.Model):
         verbose_name_plural = 'Магазины'
 
 
-class ProductBaseModel(models.Model):
+class ProductBaseModel(StringGeneratorHelperMixin, models.Model):
     name = models.CharField(max_length=100, blank=False, verbose_name='Наименование продукта')
 
     def __str__(self):
@@ -81,17 +84,6 @@ class StashBaseModel(models.Model):
 
     def __str__(self):
         return self.article
-
-    @staticmethod
-    def make_result(lim, prefix=''):
-        result = prefix
-        while len(result) < lim:
-            result += str(randrange(10))
-        return result
-
-    @classmethod
-    def get_qs_list(cls, only_field):
-        return cls.objects.only(only_field).values_list(only_field, flat=True)
 
     def create_product_article(self):
         qs_list = self.get_qs_list('article')

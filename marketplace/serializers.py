@@ -53,3 +53,8 @@ class ProductSerializerForCustomer(serializers.HyperlinkedModelSerializer):
         if len(qs) > 0:
             return ShopInfoInProduct(qs).data
         return {}
+
+
+# class StashSerializerForCustomer(serializers.HyperlinkedModelSerializer):
+#     url = serializers.HyperlinkedIdentityField()
+
