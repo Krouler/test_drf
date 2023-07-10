@@ -15,10 +15,13 @@ class Profile(StringGeneratorHelperMixin, models.Model):
     ]
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     balance = models.FloatField(default=0.0, blank=True, verbose_name='Баланс, в рублях')
+    first_name = models.CharField(max_length=25, blank=True, default='', verbose_name='Имя')
+    last_name = models.CharField(max_length=50, blank=True, default='', verbose_name=',Фамилия')
     second_name = models.CharField(max_length=25, blank=True, verbose_name='Отчество')
-    sex = models.CharField(choices=SEX_CHOICE, blank=False, verbose_name='Пол')
+    sex = models.CharField(max_length=6, choices=SEX_CHOICE, blank=True, verbose_name='Пол')
     avatar = models.ImageField(upload_to=get_image_path_for_stash, blank=True, verbose_name='Аватар')
-    invite_code = models.CharField(default='', max_length=12, blank=True, verbose_name='Личный код')
+    invite_code = models.CharField(default='', max_length=12, blank=True, verbose_name='Личный код приглашения')
+    born = models.DateField(blank=True, null=True, verbose_name='Дата рождения')
 
     def generate_invite_code(self):
         qs_list = self.get_qs_list('invite_code')

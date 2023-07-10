@@ -20,7 +20,7 @@ class Shop(ShopBaseModel):
 
 class ConfidentialInfoShop(models.Model):
     shop = models.OneToOneField(Shop, related_name='confdata', on_delete=models.CASCADE)
-    employee = models.ManyToManyField(User, related_name='shops', verbose_name='Сотрудник')
+    employee = models.ManyToManyField(User, related_name='shops', verbose_name='Сотрудник', blank=False)
     main_employee = models.ForeignKey(User, related_name='shops_maintainer', on_delete=models.PROTECT)
 
     def __str__(self):

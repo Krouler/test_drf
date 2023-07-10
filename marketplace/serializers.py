@@ -4,10 +4,21 @@ from marketplace.models import Shop, ConfidentialInfoShop, Product, Stash
 
 
 class ShopConfData(serializers.ModelSerializer):
+    employee = serializers.SerializerMethodField('get_employee_code_from_id')
+
     class Meta:
         model = ConfidentialInfoShop
         fields = '__all__'
-        read_only_fields = ('shop', 'balance')
+        read_only_fields = ()
+
+    def get_employee_code_from_id(self, obj):
+        imp = {}
+        employee = obj.employee.all()
+        for i in employee:
+            imp[i.id] = {'invite_code': i.profile.invite_code,
+                         'first_name': i.profile.first_name,
+                         'last_name': i.profile.last_name}
+        return imp
 
 
 class ShopSerializerForCustomer(serializers.HyperlinkedModelSerializer):
@@ -55,6 +66,8 @@ class ProductSerializerForCustomer(serializers.HyperlinkedModelSerializer):
         return {}
 
 
-# class StashSerializerForCustomer(serializers.HyperlinkedModelSerializer):
-#     url = serializers.HyperlinkedIdentityField()
+class InviteUserSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = ConfidentialInfoShop
+        fields = ('employee', )

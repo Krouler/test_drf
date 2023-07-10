@@ -1,29 +1,40 @@
+from django.http import Http404
 from rest_framework import viewsets, mixins, status
+from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from auth_user.models import Profile
+from auth_user.serializer import RetrieveUserSerializer
 from marketplace.models import Shop, ConfidentialInfoShop, Product
-from marketplace.permissions import IsMaintainerOrReadOnly, IsMaintainer, IsEmployeeOrIsStaffOrReadOnly
+from marketplace.permissions import IsMaintainerOrReadOnly, IsEmployeeOrIsStaffOrReadOnly, \
+    IsMaintainerOrIsAdmin, IsMaintainerOrIsAdminForRetrieveProfileFromCode
 from marketplace.serializers import ShopSerializer, ShopSerializerForCustomer, ShopConfData, \
-    ProductSerializerForCustomer
+    ProductSerializerForCustomer, InviteUserSerializer
 
 
-class RetrieveUserFromCode(mixins.CreateModelMixin, GenericViewSet):
-    serializer_class =
-    permission_classes =
-
-    def get_queryset(self):
-        return Profile.objects.filter(invite_code=self.kwargs.get('invite_code'))
+class RetrieveUserInfoFromCode(mixins.CreateModelMixin, GenericViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = RetrieveUserSerializer
+    permission_classes = (IsMaintainerOrIsAdminForRetrieveProfileFromCode,)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
+        try:
+            obj = Profile.objects.get(invite_code=serializer.validated_data.get('invite_code'))
+        except:
+            return Response({'detail': 'invite code not found'}, status=status.HTTP_404_NOT_FOUND)
+        response_serializer = RetrieveUserSerializer(obj)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
 
+
+class UpdateShopEmployeeView(mixins.UpdateModelMixin, GenericAPIView):
+    queryset = ConfidentialInfoShop.objects.all()
+    serializer_class = InviteUserSerializer
+    permission_classes = (IsMaintainerOrIsAdmin,)
+    lookup_field = 'shop__slug_name'
 
 
 class ShopViewSet(viewsets.ModelViewSet):
@@ -51,11 +62,12 @@ class ShopViewSet(viewsets.ModelViewSet):
         self.create_confdata(shop_new_object)
 
 
-class ConfDataUpdateAPIView(mixins.UpdateModelMixin, GenericViewSet):
+class ConfDataAPIView(mixins.UpdateModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
     obj = None
     queryset = ConfidentialInfoShop.objects.all()
     serializer_class = ShopConfData
-    permission_classes = (IsMaintainer,)
+    permission_classes = (IsMaintainerOrIsAdmin,)
+    lookup_field = 'shop__slug_name'
 
     def check_permissions(self, request):
         for permission in self.get_permissions():

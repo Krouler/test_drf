@@ -19,9 +19,19 @@ class ShopRouter(routers.SimpleRouter):
 
 class ConfDataRouter(routers.SimpleRouter):
     routes = [
-        routers.Route(url=r'^{prefix}$',
+        routers.Route(url=r'^{prefix}/info$',
+                      mapping={'get': 'retrieve'},
+                      name='{basename}-info-detail',
+                      detail=True,
+                      initkwargs={'suffix': 'Detail'}),
+        routers.Route(url=r'^{prefix}/invite_employee$',
                       mapping={'put': 'update', 'patch': 'partial_update'},
-                      name='{basename}-detail',
+                      name='{basename}-einvite-detail',
+                      detail=True,
+                      initkwargs={'suffix': 'Detail'}),
+        routers.Route(url=r'^{prefix}/change_main_employee$',
+                      mapping={'put': 'update', 'patch': 'partial_update'},
+                      name='{basename}-meinvite-detail',
                       detail=True,
                       initkwargs={'suffix': 'Detail'}),
     ]
