@@ -3,7 +3,7 @@ from abc import ABC
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from auth_user.models import Profile
+from auth_user.models import Profile, CartItems
 
 
 class RetrieveUserSerializer(serializers.ModelSerializer):
@@ -60,3 +60,11 @@ class UpdatePasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('old_password', 'new_password')
+
+
+class CartSerializer(serializers.ModelSerializer):
+    operation = serializers.CharField(write_only=True, max_length=6, required=False)
+
+    class Meta:
+        model = CartItems
+        fields = '__all__'
