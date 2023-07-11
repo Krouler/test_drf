@@ -8,11 +8,11 @@ from rest_framework.viewsets import GenericViewSet
 
 from auth_user.models import Profile
 from auth_user.serializer import RetrieveUserSerializer
-from marketplace.models import Shop, ConfidentialInfoShop, Product
+from marketplace.models import Shop, ConfidentialInfoShop, Product, Stash
 from marketplace.permissions import IsMaintainerOrReadOnly, IsEmployeeOrIsStaffOrReadOnly, \
-    IsMaintainerOrIsAdmin, IsMaintainerOrIsAdminForRetrieveProfileFromCode
+    IsMaintainerOrIsAdmin, IsMaintainerOrIsAdminForRetrieveProfileFromCode, IsEmployeeOrReadOnly
 from marketplace.serializers import ShopSerializer, ShopSerializerForCustomer, ShopConfData, \
-    ProductSerializerForCustomer, InviteUserSerializer
+    ProductSerializerForCustomer, InviteUserSerializer, StashSerializer
 
 
 class RetrieveUserInfoFromCode(mixins.CreateModelMixin, GenericViewSet):
@@ -93,9 +93,9 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 
 class StashViewSet(viewsets.ModelViewSet):
-    serializer_class =
-    permission_classes =
-    queryset =
+    serializer_class = StashSerializer
+    permission_classes = (IsEmployeeOrReadOnly,)
+    queryset = Stash.objects.all()
     filterset_fields = ['cost',
                         'product__name',
                         '=is_delivery_available',

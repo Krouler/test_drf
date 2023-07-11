@@ -61,3 +61,11 @@ class IsMaintainerOrIsAdminForRetrieveProfileFromCode(IsMaintainerOrIsAdmin):
     def has_object_permission(self, request, view, obj):
         return self.has_permission(request=request, view=view)
 
+
+class IsEmployeeOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS
+
+    def has_object_permission(self, request, view, obj):
+        return bool(request.method in SAFE_METHODS or request.user in obj.select_related('shop').shop.employee.all())
+

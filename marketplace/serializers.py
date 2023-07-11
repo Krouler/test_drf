@@ -71,3 +71,10 @@ class InviteUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConfidentialInfoShop
         fields = ('employee', )
+
+
+class StashSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Stash
+        fields = '__all__'

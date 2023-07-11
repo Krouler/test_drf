@@ -2,13 +2,16 @@ from django.urls import path, include
 
 from rest_framework.routers import DefaultRouter
 
-from marketplace.views import ShopViewSet, ConfDataAPIView, ProductViewSet, RetrieveUserInfoFromCode
+from marketplace.views import ShopViewSet, ConfDataAPIView, ProductViewSet, RetrieveUserInfoFromCode, StashViewSet
 
 routerShop = DefaultRouter()
 routerShop.register(r'shop', ShopViewSet)
 routerProduct = DefaultRouter()
 routerProduct.register(r'product', ProductViewSet, basename='product')
 routerShop.registry.extend(routerProduct.registry)
+routerStash = DefaultRouter()
+routerStash.register(r'stash', StashViewSet)
+routerShop.registry.extend(routerStash.registry)
 
 urlpatterns = [
     path('', include(routerShop.urls)),
