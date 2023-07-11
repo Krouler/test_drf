@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from marketplace.models import Stash
 from marketplace.models_base import StringGeneratorHelperMixin
 
 
@@ -39,3 +40,27 @@ class Profile(StringGeneratorHelperMixin, models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class Cart(models.Model):
+    profile = models.OneToOneField(Profile, related_name='cart', on_delete=models.CASCADE, verbose_name='Профиль пользователя')
+
+    def __str__(self):
+        return self.profile.user.username
+
+    class Meta:
+        verbose_name = 'Корзина'
+        verbose_name_plural = 'Корзины'
+
+
+class CartItems(models.Model):
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE, verbose_name='Корзина')
+    product = models.ForeignKey(Stash, related_name='in_carts', on_delete=models.CASCADE, verbose_name='Продукт в магазине')
+    count = models.PositiveIntegerField(default=1, verbose_name='Количество', null=False, blank=True)
+
+    def __str__(self):
+        return f'{self.cart.profile.user.username}: {self.product.product.name} - {self.count}'
+
+    class Meta:
+        verbose_name = 'Продукт в корзине'
+        verbose_name_plural = 'Продукты в корзине'

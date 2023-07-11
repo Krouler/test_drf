@@ -8,11 +8,12 @@ from rest_framework.viewsets import GenericViewSet
 
 from auth_user.models import Profile
 from auth_user.serializer import RetrieveUserSerializer
-from marketplace.models import Shop, ConfidentialInfoShop, Product, Stash
+from marketplace.models import Shop, ConfidentialInfoShop, Product, Stash, CommentShopProduct
 from marketplace.permissions import IsMaintainerOrReadOnly, IsEmployeeOrIsStaffOrReadOnly, \
-    IsMaintainerOrIsAdmin, IsMaintainerOrIsAdminForRetrieveProfileFromCode, IsEmployeeOrReadOnly
+    IsMaintainerOrIsAdmin, IsMaintainerOrIsAdminForRetrieveProfileFromCode, IsEmployeeOrReadOnly, \
+    IsAuthenticatedOrCommentOwnerOrReadOnly
 from marketplace.serializers import ShopSerializer, ShopSerializerForCustomer, ShopConfData, \
-    ProductSerializerForCustomer, InviteUserSerializer, StashSerializer
+    ProductSerializerForCustomer, InviteUserSerializer, StashSerializer, CommentSerializer
 
 
 class RetrieveUserInfoFromCode(mixins.CreateModelMixin, GenericViewSet):
@@ -106,3 +107,8 @@ class StashViewSet(viewsets.ModelViewSet):
                         'count']
 
 
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthenticatedOrCommentOwnerOrReadOnly,)
+    queryset = CommentShopProduct.objects.all()
+    filterset_fields = ['stash__article', 'user']

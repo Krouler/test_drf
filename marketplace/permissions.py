@@ -69,3 +69,13 @@ class IsEmployeeOrReadOnly(BasePermission):
     def has_object_permission(self, request, view, obj):
         return bool(request.method in SAFE_METHODS or request.user in obj.select_related('shop').shop.employee.all())
 
+
+class IsAuthenticatedOrCommentOwnerOrReadOnly(BasePermission):
+
+    def has_permission(self, request, view):
+        return bool(request.user.is_authenticated or request.method in SAFE_METHODS)
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_authenticated:
+            return bool(obj.user == request.user or request.method in SAFE_METHODS)
+        return bool(request.method in SAFE_METHODS)

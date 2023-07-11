@@ -73,7 +73,7 @@ class ProductBaseModel(StringGeneratorHelperMixin, models.Model):
         verbose_name_plural = 'Продукты'
 
 
-class StashBaseModel(models.Model):
+class StashBaseModel(StringGeneratorHelperMixin, models.Model):
     article = models.CharField(max_length=15, default='', blank=True, editable=False,
                                unique=True, verbose_name='Артикул')
     cost = models.FloatField(default=0.0, blank=False, verbose_name='Стоимость, в рублях')

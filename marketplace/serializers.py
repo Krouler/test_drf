@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from marketplace.models import Shop, ConfidentialInfoShop, Product, Stash
+from marketplace.models import Shop, ConfidentialInfoShop, Product, Stash, CommentShopProduct
 
 
 class ShopConfData(serializers.ModelSerializer):
@@ -78,3 +78,11 @@ class StashSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stash
         fields = '__all__'
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CommentShopProduct
+        fields = '__all__'
+
