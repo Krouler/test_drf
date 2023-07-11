@@ -1,7 +1,12 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
 from auth_user.views import UpdateUserViewSet, RetrieveOrCreateProfileViewSet, RegistrationApiView, \
-    UpdateUserPasswordViewSet
+    UpdateUserPasswordViewSet, CartGenericViewSet
+
+routerCart = DefaultRouter()
+routerCart.register(r'cart', CartGenericViewSet, basename='cart')
+
 
 urlpatterns = [
     path('registration/', RegistrationApiView.as_view(), name='create-user'),
@@ -9,5 +14,7 @@ urlpatterns = [
     path('me/update/', UpdateUserViewSet.as_view({'put': 'update', 'patch': 'partial_update'}),
          name='update-profile'),
     path('me/password/', UpdateUserPasswordViewSet.as_view({'post': 'create'}),
-         name='update-password')
+         name='update-password'),
+    path('me/', include(routerCart.urls)),
+    path('me/cart/all/', CartGenericViewSet.as_view({'delete': 'destroy_all'}), name='cart-destroy_all')
 ]

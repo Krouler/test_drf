@@ -82,7 +82,11 @@ class UpdateUserPasswordViewSet(mixins.CreateModelMixin, GenericViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-class CartGenericViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, GenericViewSet):
+class CartGenericViewSet(mixins.CreateModelMixin,
+                         mixins.UpdateModelMixin,
+                         mixins.ListModelMixin,
+                         mixins.DestroyModelMixin,
+                         GenericViewSet):
     queryset = None
     cost_for_buy_operation = None
     permission_classes = (IsAuthenticated,)
@@ -97,6 +101,11 @@ class CartGenericViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mix
         self.queryset = cart_obj.items.all()
         return self.queryset
 
+    def destroy_all(self, request, *args, **kwargs):
+        qs = request.user.profile.cart.items.all()
+        qs.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     def sum_costs_of_all_items_in_cart(self):
         qs = self.queryset if self.queryset is not None else self.get_queryset()
         sum_result = 0
@@ -105,11 +114,8 @@ class CartGenericViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mix
         self.cost_for_buy_operation = sum_result
         return sum_result
 
-    def buy_operation(self, serializer=None):
+    def buy_operation(self):
         profile = self.request.user.profile
-        # if serializer is not None:
-        #
-        # else:
         costs = self.cost_for_buy_operation if self.cost_for_buy_operation is not None else self.sum_costs_of_all_items_in_cart()
         if profile.balance < costs:
             raise Exception(f'Не достаточно денег на балансе для совершения покупки! Итого: {costs}, а ваш баланс - {profile.balance}')
