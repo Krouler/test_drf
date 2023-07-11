@@ -1,3 +1,4 @@
+import rest_framework.filters
 from django.http import Http404
 from rest_framework import viewsets, mixins, status
 from rest_framework.generics import GenericAPIView, get_object_or_404
@@ -91,6 +92,17 @@ class ProductViewSet(viewsets.ModelViewSet):
         return Product.objects.only('name').filter(**self.create_filter_kwargs())
 
 
-# class StashViewSet(viewsets.ModelViewSet):
-#     serializer_class = StashSerializerForCustomer
-#     permission_classes =
+class StashViewSet(viewsets.ModelViewSet):
+    serializer_class =
+    permission_classes =
+    queryset =
+    filterset_fields = ['cost',
+                        'product__name',
+                        '=is_delivery_available',
+                        'shop__name',
+                        '=shop_id',
+                        '=product_id',
+                        'description',
+                        'count']
+
+

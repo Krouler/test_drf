@@ -13,7 +13,7 @@ class ShopConfData(serializers.ModelSerializer):
 
     def get_employee_code_from_id(self, obj):
         imp = {}
-        employee = obj.employee.all()
+        employee = obj.employee.select_related('profile').all()
         for i in employee:
             imp[i.id] = {'invite_code': i.profile.invite_code,
                          'first_name': i.profile.first_name,
