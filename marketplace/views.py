@@ -98,10 +98,10 @@ class StashViewSet(viewsets.ModelViewSet):
     queryset = Stash.objects.all()
     filterset_fields = ['cost',
                         'product__name',
-                        '=is_delivery_available',
+                        'is_delivery_available',
                         'shop__name',
-                        '=shop_id',
-                        '=product_id',
+                        'shop_id',
+                        'product_id',
                         'description',
                         'count']
 
