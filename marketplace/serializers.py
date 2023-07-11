@@ -17,7 +17,8 @@ class ShopConfData(serializers.ModelSerializer):
         for i in employee:
             imp[i.id] = {'invite_code': i.profile.invite_code,
                          'first_name': i.profile.first_name,
-                         'last_name': i.profile.last_name}
+                         'last_name': i.profile.last_name,
+                         'username': i.username}
         return imp
 
 

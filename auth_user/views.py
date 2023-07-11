@@ -11,6 +11,7 @@ from auth_user.models import Profile, Cart
 from auth_user.permissions import NotAuthed
 from auth_user.serializer import UpdateUserSerializer, SelfProfileSerializer, CreateUserSerializer, \
     UpdatePasswordSerializer, CartSerializer
+from marketplace.models import Shop
 
 
 class UpdateUserViewSet(mixins.UpdateModelMixin, GenericViewSet):
@@ -87,10 +88,14 @@ class CartGenericViewSet(mixins.CreateModelMixin,
                          mixins.ListModelMixin,
                          mixins.DestroyModelMixin,
                          GenericViewSet):
-    queryset = None
-    cost_for_buy_operation = None
     permission_classes = (IsAuthenticated,)
     serializer_class = CartSerializer
+
+    def __init__(self):
+        super().__init__()
+        self.queryset = None
+        self.shops_payments = {}
+        self.cost_for_buy_operation = None
 
     def get_queryset(self):
         if self.queryset is not None:
@@ -103,8 +108,11 @@ class CartGenericViewSet(mixins.CreateModelMixin,
 
     def destroy_all(self, request, *args, **kwargs):
         qs = request.user.profile.cart.items.all()
-        qs.delete()
+        self.destroy_all(qs)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_destroy_all(self, qs):
+        qs.delete()
 
     def sum_costs_of_all_items_in_cart(self):
         qs = self.queryset if self.queryset is not None else self.get_queryset()
@@ -113,6 +121,19 @@ class CartGenericViewSet(mixins.CreateModelMixin,
             sum_result += item.product.cost * item.count
         self.cost_for_buy_operation = sum_result
         return sum_result
+
+    def save_payment_for_shops(self, cart_item):
+        shop = cart_item.product.shop
+        if self.shops_payments.get(shop.name, None) is not None:
+            self.shops_payments[str(shop.id)] += cart_item.product.cost * cart_item.product.count
+        else:
+            self.shops_payments[str(shop.id)] = cart_item.product.cost * cart_item.product.count
+
+    def pay_to_shops(self):
+        for key, value in self.shops_payments.items():
+            shop_obj = Shop.objects.get(id=int(key))
+            shop_obj.balance += value
+            shop_obj.save()
 
     def buy_operation(self):
         profile = self.request.user.profile
@@ -124,11 +145,13 @@ class CartGenericViewSet(mixins.CreateModelMixin,
             product = item.product
             if item.count > product.count:
                 raise Exception(f'Не достаточно товара на складе! "{item.product.name}" было запрошено {item.count} штук, но на складе есть {item.product.count}!')
+            self.save_payment_for_shops(item)
             product.count -= item.count
             product.save()
         profile.balance -= costs
         profile.save()
         qs.all().delete()
+        self.pay_to_shops()
 
     def perform_create(self, serializer):
         if serializer.validated_data.get('operation') == 'buy':
