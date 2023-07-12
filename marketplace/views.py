@@ -123,7 +123,7 @@ class StashViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         except ObjectDoesNotExist:
             if request.method == 'PATCH':
-                return Response(status=status.HTTP_404_NOT_FOUND)
+                return Http404
             serializer = StashSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
