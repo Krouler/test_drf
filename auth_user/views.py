@@ -10,7 +10,7 @@ from rest_framework.viewsets import GenericViewSet
 from auth_user.models import Profile, Cart
 from auth_user.permissions import NotAuthed
 from auth_user.serializer import UpdateUserSerializer, SelfProfileSerializer, CreateUserSerializer, \
-    UpdatePasswordSerializer, CartSerializer
+    UpdatePasswordSerializer, CartSerializer, ListShopsWhereUserIsEmployeeSerializer
 from marketplace.models import Shop
 
 
@@ -162,4 +162,13 @@ class CartGenericViewSet(mixins.CreateModelMixin,
                 return Response({'error': str(e)})
         else:
             serializer.save()
+
+
+class GetShopCollectionWhereUserIsEmployee(mixins.ListModelMixin, GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ListShopsWhereUserIsEmployeeSerializer
+
+    def get_queryset(self):
+        return Shop.objects.filter(confdata__employee__id=self.request.user.id)
+
 

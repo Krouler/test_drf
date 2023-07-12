@@ -1,4 +1,5 @@
 import rest_framework.filters
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from rest_framework import viewsets, mixins, status
 from rest_framework.generics import GenericAPIView, get_object_or_404
@@ -105,6 +106,28 @@ class StashViewSet(viewsets.ModelViewSet):
                         'product_id',
                         'description',
                         'count']
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        try:
+            instance = self.queryset.get(id=self.kwargs[self.lookup_url_kwarg])
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+
+            if getattr(instance, '_prefetched_objects_cache', None):
+                # If 'prefetch_related' has been applied to a queryset, we need to
+                # forcibly invalidate the prefetch cache on the instance.
+                instance._prefetched_objects_cache = {}
+
+            return Response(serializer.data)
+        except ObjectDoesNotExist:
+            if request.method == 'PATCH':
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            serializer = StashSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class CommentViewSet(viewsets.ModelViewSet):

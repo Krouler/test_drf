@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from auth_user.models import Profile, CartItems
+from marketplace.models import Shop, ConfidentialInfoShop
 
 
 class RetrieveUserSerializer(serializers.ModelSerializer):
@@ -68,3 +69,11 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItems
         fields = '__all__'
+
+
+class ListShopsWhereUserIsEmployeeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Shop
+        fields = ('id', 'name')
+        read_only_fields = ('id', 'name')

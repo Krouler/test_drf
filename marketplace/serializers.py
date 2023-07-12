@@ -79,6 +79,10 @@ class StashSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stash
         fields = '__all__'
+        extra_kwargs = {
+            'shop_id': {'required': True},
+            'product_id': {'required': True}
+        }
 
 
 class CommentSerializer(serializers.ModelSerializer):
